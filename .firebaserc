@@ -1,0 +1,22 @@
+{
+  "projects": {
+    "default": "sivakesh-1977"
+  },
+  "targets": {
+    "resume-intelligence-ai": {
+      "hosting": {
+        "sivakesh": [
+          "sivakesh"
+        ]
+      }
+    },
+    "sivakesh-1977": {
+      "hosting": {
+        "sivakesh": [
+          "sivakesh"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

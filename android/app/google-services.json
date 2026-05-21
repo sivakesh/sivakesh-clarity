@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "960407494732",
+    "project_id": "sivakesh-1977",
+    "storage_bucket": "sivakesh-1977.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:960407494732:android:e429eff7145f271a7414e9",
+        "android_client_info": {
+          "package_name": "com.sivakesh.counselingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "960407494732-dhhvccbqe9ik77iq40tt1ppotdgrq184.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS_RSyL9IlBrIqk3crBNw4nj2d09vDs_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "960407494732-dhhvccbqe9ik77iq40tt1ppotdgrq184.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
