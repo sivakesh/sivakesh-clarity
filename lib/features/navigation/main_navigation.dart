@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/auth/auth_factory.dart';
 import '../assessment/screens/assessment_screen.dart';
 import '../chat/screens/chat_screen.dart';
+import '../chat/data/chat_entry_context.dart';
 import '../home/screens/home_screen.dart';
 import '../profile/screens/profile_screen.dart';
 import '../auth/screens/login_screen.dart';
@@ -19,28 +20,44 @@ class _MainNavigationState extends State<MainNavigation> {
   final _authService = AuthFactory.create();
   bool _isLoggingOut = false;
 
-  final List<_NavDestination> _destinations = const [
-    _NavDestination(
-      label: 'Home',
-      icon: Icons.home_rounded,
-      screen: HomeScreen(),
-    ),
-    _NavDestination(
-      label: 'Chat',
-      icon: Icons.chat_bubble_rounded,
-      screen: ChatScreen(),
-    ),
-    _NavDestination(
-      label: 'Assess',
-      icon: Icons.checklist_rounded,
-      screen: AssessmentScreen(),
-    ),
-    _NavDestination(
-      label: 'Profile',
-      icon: Icons.person_rounded,
-      screen: ProfileScreen(),
-    ),
-  ];
+  late final List<_NavDestination> _destinations;
+
+  @override
+  void initState() {
+    super.initState();
+      _destinations = [
+        _NavDestination(
+          label: 'Home',
+          icon: Icons.home_rounded,
+          screen: HomeScreen(
+            onStartJourney: () => _currentIndex.value = 2,
+            onReflectMore: () {
+              ChatEntryContextBus.set(source: 'reflect_button');
+              _currentIndex.value = 1;
+            },
+            onTakeAssessment: () => _currentIndex.value = 2,
+            onTalkItOut: (_) {
+              _currentIndex.value = 1;
+            },
+          ),
+        ),
+      const _NavDestination(
+        label: 'Chat',
+        icon: Icons.chat_bubble_rounded,
+        screen: ChatScreen(),
+      ),
+      const _NavDestination(
+        label: 'Assess',
+        icon: Icons.checklist_rounded,
+        screen: AssessmentScreen(),
+      ),
+      const _NavDestination(
+        label: 'Profile',
+        icon: Icons.person_rounded,
+        screen: ProfileScreen(),
+      ),
+    ];
+  }
 
   @override
   void dispose() {
