@@ -60,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 24),
                         MoodCheckCard(
                           userId: snapshot.data?.id,
+                          userName: snapshot.data?.name,
                           onReflectMore: widget.onReflectMore,
                           onTakeAssessment: widget.onTakeAssessment,
                           onMoodSelected: (mood) {

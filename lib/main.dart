@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'core/auth/auth_factory.dart';
 import 'core/config/app_environment.dart';
+import 'core/utils/web_loader_remover.dart';
 import 'firebase_options.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/core/role_based_home.dart';
@@ -17,6 +18,10 @@ Future<void> main() async {
   print('Current ENV: ${AppConfig.environment}');
 
   runApp(const AppStartGate());
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    removeWebLoaderSafely();
+  });
 }
 
 class AppStartGate extends StatelessWidget {

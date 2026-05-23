@@ -9,6 +9,7 @@ import 'mood_line_chart.dart';
 
 class MoodCheckCard extends StatefulWidget {
   final String? userId;
+  final String? userName;
   final VoidCallback onReflectMore;
   final VoidCallback onTakeAssessment;
   final ValueChanged<String?> onMoodSelected;
@@ -16,6 +17,7 @@ class MoodCheckCard extends StatefulWidget {
   const MoodCheckCard({
     super.key,
     required this.userId,
+    required this.userName,
     required this.onReflectMore,
     required this.onTakeAssessment,
     required this.onMoodSelected,
@@ -39,6 +41,7 @@ class _MoodCheckCardState extends State<MoodCheckCard> {
   int _historyStartIndex = 0;
   Stream<QuerySnapshot<Map<String, dynamic>>>? _todayMomentStream;
   Stream<QuerySnapshot<Map<String, dynamic>>>? _historyStream;
+  bool _namePromptShown = false;
 
   @override
   void initState() {
@@ -84,11 +87,99 @@ class _MoodCheckCardState extends State<MoodCheckCard> {
     try {
       await _checkinService.saveCheckin(userId: userId, mood: mood);
       widget.onMoodSelected(mood);
+      await _maybeCaptureName();
     } finally {
       if (mounted) {
         setState(() {
           _isSaving = false;
         });
+      }
+    }
+  }
+
+  Future<void> _maybeCaptureName() async {
+    final userId = widget.userId;
+    if (!mounted || userId == null || userId.isEmpty || _namePromptShown) return;
+    final currentName = widget.userName?.trim() ?? '';
+    if (currentName.isNotEmpty) return;
+    _namePromptShown = true;
+    await _showNameCaptureModal(userId);
+  }
+
+  Future<void> _showNameCaptureModal(String userId) async {
+    final controller = TextEditingController();
+    String? errorText;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setLocalState) {
+            return AlertDialog(
+              title: const Text('What should we call you?'),
+              content: TextField(
+                controller: controller,
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) async {
+                  await _saveNameAndClose(
+                    dialogContext: dialogContext,
+                    userId: userId,
+                    name: controller.text.trim(),
+                    onError: (message) => setLocalState(() => errorText = message),
+                  );
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter your name',
+                  errorText: errorText,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Skip'),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    await _saveNameAndClose(
+                      dialogContext: dialogContext,
+                      userId: userId,
+                      name: controller.text.trim(),
+                      onError: (message) => setLocalState(() => errorText = message),
+                    );
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _saveNameAndClose({
+    required BuildContext dialogContext,
+    required String userId,
+    required String name,
+    required ValueChanged<String> onError,
+  }) async {
+    if (name.length < 2) {
+      onError('Please enter at least 2 characters');
+      return;
+    }
+    final rootMessenger = ScaffoldMessenger.of(context);
+    final dialogNavigator = Navigator.of(dialogContext);
+    try {
+      await _firestore.collection('users').doc(userId).update({'name': name});
+    } catch (_) {
+      rootMessenger.showSnackBar(
+        const SnackBar(content: Text('Could not save name right now.')),
+      );
+    } finally {
+      if (dialogNavigator.canPop()) {
+        dialogNavigator.pop();
       }
     }
   }

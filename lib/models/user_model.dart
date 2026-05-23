@@ -1,14 +1,14 @@
 class UserModel {
   final String id;
   final String phone;
-  final String name;
+  final String? name;
   final String? authUid;
   final String role;
 
   const UserModel({
     required this.id,
     required this.phone,
-    required this.name,
+    this.name,
     this.authUid,
     required this.role,
   });
@@ -25,7 +25,7 @@ class UserModel {
     return UserModel(
       id: (json['id'] as String?) ?? '',
       phone: (json['phone'] as String?) ?? '',
-      name: (json['name'] as String?) ?? '',
+      name: json['name'] as String?,
       authUid: json['authUid'] as String?,
       role: (json['role'] as String?) ?? 'user',
     );
