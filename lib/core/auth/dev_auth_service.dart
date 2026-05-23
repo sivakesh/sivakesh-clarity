@@ -59,7 +59,7 @@ class DevAuthService implements AuthService {
         'updatedAt': FieldValue.serverTimestamp(),
         'lastLogin': FieldValue.serverTimestamp(),
       });
-      user = UserModel(id: doc.id, phone: normalizedPhone, name: '', authUid: null);
+      user = UserModel(id: doc.id, phone: normalizedPhone, name: '', authUid: null, role: 'user');
     }
 
     final sessionId = await _sessionService.openSession(user);
@@ -132,6 +132,7 @@ class DevAuthService implements AuthService {
       phone: (data['phone'] as String?) ?? '',
       name: (data['name'] as String?) ?? '',
       authUid: data['authUid'] as String?,
+      role: (data['role'] as String?) ?? 'user',
     );
   }
 

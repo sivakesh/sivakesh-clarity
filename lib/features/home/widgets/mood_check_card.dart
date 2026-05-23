@@ -100,38 +100,6 @@ class _MoodCheckCardState extends State<MoodCheckCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (userId != null) ...[
-          StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            key: const ValueKey('today_state'),
-            stream: _todayMomentStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                debugPrint(
-                  'todayMomentCheckins stream error (today state card): ${snapshot.error}',
-                );
-                final mood = _selectedMood;
-                final title = mood == null
-                    ? 'Start your check-in'
-                    : "Today you're feeling: $mood";
-                return _buildTodayStateCard(
-                  title: title,
-                  subtitle: _todaySubtitle(mood),
-                  mood: mood,
-                );
-              }
-              final docs = snapshot.data?.docs ?? [];
-              final mood = docs.isEmpty ? null : _averageMoodFromDocs(docs);
-              final title = mood == null
-                  ? 'Start your check-in'
-                  : "Today you're feeling: $mood";
-              return _buildTodayStateCard(
-                title: title,
-                subtitle: _todaySubtitle(mood),
-                mood: mood,
-              );
-            },
-          ),
-        ],
         StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           key: const ValueKey('mood_card_context'),
           stream: _todayMomentStream,
@@ -190,23 +158,23 @@ class _MoodCheckCardState extends State<MoodCheckCard> {
                             const SizedBox(height: 12),
                             Row(
                               children: [
-                                OutlinedButton(
-                                  onPressed: widget.onReflectMore,
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                      color: Color(0x39FFFFFF),
-                                    ),
-                                    foregroundColor: const Color(0xFFE2E6EF),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 10,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text('Talk it out'),
-                                ),
+                                // OutlinedButton(
+                                //   onPressed: widget.onReflectMore,
+                                //   style: OutlinedButton.styleFrom(
+                                //     side: const BorderSide(
+                                //       color: Color(0x39FFFFFF),
+                                //     ),
+                                //     foregroundColor: const Color(0xFFE2E6EF),
+                                //     padding: const EdgeInsets.symmetric(
+                                //       horizontal: 14,
+                                //       vertical: 10,
+                                //     ),
+                                //     shape: RoundedRectangleBorder(
+                                //       borderRadius: BorderRadius.circular(12),
+                                //     ),
+                                //   ),
+                                //   child: const Text('Talk it out'),
+                                // ),
                                 const SizedBox(width: 10),
                                 FilledButton(
                                   onPressed: widget.onTakeAssessment,
@@ -392,6 +360,40 @@ class _MoodCheckCardState extends State<MoodCheckCard> {
             );
           },
         ),
+        const SizedBox(height: 16),
+        if (userId != null) ...[
+          
+          StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            key: const ValueKey('today_state'),
+            stream: _todayMomentStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                debugPrint(
+                  'todayMomentCheckins stream error (today state card): ${snapshot.error}',
+                );
+                final mood = _selectedMood;
+                final title = mood == null
+                    ? 'Start your check-in'
+                    : "Today you're feeling: $mood";
+                return _buildTodayStateCard(
+                  title: title,
+                  subtitle: _todaySubtitle(mood),
+                  mood: mood,
+                );
+              }
+              final docs = snapshot.data?.docs ?? [];
+              final mood = docs.isEmpty ? null : _averageMoodFromDocs(docs);
+              final title = mood == null
+                  ? 'Start your check-in'
+                  : "Today you're feeling: $mood";
+              return _buildTodayStateCard(
+                title: title,
+                subtitle: _todaySubtitle(mood),
+                mood: mood,
+              );
+            },
+          ),
+        ],
         const SizedBox(height: 22),
         Row(
           children: [

@@ -5,7 +5,7 @@ import 'core/auth/auth_factory.dart';
 import 'core/config/app_environment.dart';
 import 'firebase_options.dart';
 import 'features/auth/screens/login_screen.dart';
-import 'features/navigation/main_navigation.dart';
+import 'features/core/role_based_home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -70,7 +70,7 @@ class AuthGate extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          return const MainNavigation();
+          return RoleBasedHome(user: snapshot.data!);
         }
 
         return const LoginScreen();

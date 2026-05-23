@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/auth/auth_factory.dart';
+import '../../models/user_model.dart';
+import '../admin/admin_shell.dart';
 import '../assessment/screens/assessment_screen.dart';
 import '../chat/screens/chat_screen.dart';
 import '../chat/data/chat_entry_context.dart';
@@ -9,7 +11,9 @@ import '../profile/screens/profile_screen.dart';
 import '../auth/screens/login_screen.dart';
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
+  final UserModel? user;
+
+  const MainNavigation({super.key, this.user});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
@@ -75,13 +79,16 @@ class _MainNavigationState extends State<MainNavigation> {
             final isWide = constraints.maxWidth > 800;
 
             if (isWide) {
+              const double sidebarWidth = 72;
+              final bool isCollapsed = sidebarWidth < 100;
               return Scaffold(
                 body: Row(
                   children: [
                     Container(
-                      width: 88,
+                      width: sidebarWidth,
                       color: const Color(0xFF121212),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: NavigationRail(
@@ -104,53 +111,146 @@ class _MainNavigationState extends State<MainNavigation> {
                                   .toList(),
                             ),
                           ),
+                          const Spacer(),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
-                            child: Tooltip(
-                              message: 'Logout',
-                              child: InkWell(
-                                onTap: _isLoggingOut ? null : () => _handleLogout(context),
-                                borderRadius: BorderRadius.circular(12),
-                                hoverColor: const Color(0x22FF8C8C),
-                                child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
                                   width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: const Color(0x33FF9A9A)),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      _isLoggingOut
-                                          ? const SizedBox(
-                                              height: 16,
-                                              width: 16,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: Color(0xFFE8B0B0),
+                                  child: isCollapsed
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
+                                          child: Tooltip(
+                                            message: 'Logout',
+                                            child: InkWell(
+                                              onTap: _isLoggingOut ? null : () => _handleLogout(context),
+                                              borderRadius: BorderRadius.circular(12),
+                                              child: Container(
+                                                height: 48,
+                                                alignment: Alignment.center,
+                                                child: _isLoggingOut
+                                                    ? const SizedBox(
+                                                        height: 16,
+                                                        width: 16,
+                                                        child: CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Colors.white70,
+                                                        ),
+                                                      )
+                                                    : const Icon(
+                                                        Icons.logout,
+                                                        color: Colors.white70,
+                                                      ),
                                               ),
-                                            )
-                                          : const Icon(
-                                              Icons.logout_rounded,
-                                              color: Color(0xFFE8B0B0),
-                                              size: 18,
                                             ),
-                                      const SizedBox(height: 4),
-                                      const Text(
-                                        'Logout',
-                                        style: TextStyle(
-                                          color: Color(0xFFE8B0B0),
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
+                                          ),
+                                        )
+                                      : OutlinedButton.icon(
+                                          onPressed: _isLoggingOut ? null : () => _handleLogout(context),
+                                          icon: _isLoggingOut
+                                              ? const SizedBox(
+                                                  height: 16,
+                                                  width: 16,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Colors.white70,
+                                                  ),
+                                                )
+                                              : const Icon(
+                                                  Icons.logout,
+                                                  size: 18,
+                                                  color: Colors.white70,
+                                                ),
+                                          label: const Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              'Logout',
+                                              style: TextStyle(
+                                                color: Colors.white70,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            alignment: Alignment.centerLeft,
+                                            side: const BorderSide(color: Colors.white24),
+                                            backgroundColor: Colors.transparent,
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                          ).copyWith(
+                                            backgroundColor: WidgetStateProperty.resolveWith((states) {
+                                              if (states.contains(WidgetState.hovered)) {
+                                                return Colors.white12;
+                                              }
+                                              return Colors.transparent;
+                                            }),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
                                 ),
-                              ),
+                                const SizedBox(height: 12),
+                                if (_isAdmin)
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: isCollapsed
+                                        ? Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 8),
+                                            child: Tooltip(
+                                              message: 'Admin',
+                                              child: InkWell(
+                                                onTap: () => _openAdmin(context),
+                                                borderRadius: BorderRadius.circular(12),
+                                                child: const SizedBox(
+                                                  height: 48,
+                                                  child: Center(
+                                                    child: Icon(
+                                                      Icons.admin_panel_settings,
+                                                      color: Colors.white70,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : OutlinedButton.icon(
+                                            onPressed: () => _openAdmin(context),
+                                            icon: const Icon(
+                                              Icons.admin_panel_settings,
+                                              size: 18,
+                                              color: Color(0xFFB7CCFF),
+                                            ),
+                                            label: const Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                'Admin',
+                                                style: TextStyle(
+                                                  color: Color(0xFFB7CCFF),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            style: OutlinedButton.styleFrom(
+                                              alignment: Alignment.centerLeft,
+                                              side: const BorderSide(color: Color(0x337FA8FF)),
+                                              backgroundColor: Colors.transparent,
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ).copyWith(
+                                              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                                                if (states.contains(WidgetState.hovered)) {
+                                                  return Colors.white12;
+                                                }
+                                                return Colors.transparent;
+                                              }),
+                                            ),
+                                          ),
+                                  ),
+                              ],
                             ),
                           ),
                         ],
@@ -168,6 +268,27 @@ class _MainNavigationState extends State<MainNavigation> {
                 backgroundColor: const Color(0xFF121212),
                 elevation: 0,
                 actions: [
+                  if (_isAdmin)
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value == 'admin') {
+                          _openAdmin(context);
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem<String>(
+                          value: 'admin',
+                          child: Row(
+                            children: [
+                              Icon(Icons.admin_panel_settings, size: 18),
+                              SizedBox(width: 8),
+                              Text('Admin'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(right: 12),
                     child: TextButton.icon(
@@ -178,10 +299,32 @@ class _MainNavigationState extends State<MainNavigation> {
                               width: 16,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Icon(Icons.logout_rounded, size: 18),
-                      label: const Text('Logout'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFE8B0B0),
+                          : const Icon(
+                              Icons.logout,
+                              size: 18,
+                              color: Colors.white70,
+                            ),
+                      label: const Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white24),
+                        backgroundColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ).copyWith(
+                        backgroundColor: WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.hovered)) {
+                            return Colors.white12;
+                          }
+                          return Colors.transparent;
+                        }),
                       ),
                     ),
                   ),
@@ -206,6 +349,15 @@ class _MainNavigationState extends State<MainNavigation> {
           },
         );
       },
+    );
+  }
+
+  bool get _isAdmin => widget.user?.role == 'admin';
+
+  void _openAdmin(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AdminShell()),
     );
   }
 

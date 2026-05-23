@@ -185,6 +185,7 @@ class ProdAuthService implements AuthService {
       phone: (data['phone'] as String?) ?? '',
       name: (data['name'] as String?) ?? '',
       authUid: (data['authUid'] as String?) ?? '',
+      role: (data['role'] as String?) ?? 'user',
     );
   }
 

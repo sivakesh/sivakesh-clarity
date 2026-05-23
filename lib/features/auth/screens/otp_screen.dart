@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/auth/auth_service.dart';
-import '../../navigation/main_navigation.dart';
+import '../../core/role_based_home.dart';
 import '../widgets/otp_input.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -24,12 +24,12 @@ class _OtpScreenState extends State<OtpScreen> {
     });
 
     try {
-      await widget.authService.verifyOtp(code);
+      final user = await widget.authService.verifyOtp(code);
       if (!mounted) {
         return;
       }
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainNavigation()),
+        MaterialPageRoute(builder: (_) => RoleBasedHome(user: user!)),
         (route) => false,
       );
     } catch (e) {

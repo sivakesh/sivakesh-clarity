@@ -57,7 +57,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const HomeHeader(),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 24),
+                        MoodCheckCard(
+                          userId: snapshot.data?.id,
+                          onReflectMore: widget.onReflectMore,
+                          onTakeAssessment: widget.onTakeAssessment,
+                          onMoodSelected: (mood) {
+                            if (mood == null || mood.isEmpty) return;
+                            setState(() {
+                              _selectedMoodForAction = mood;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
                         ActionButtons(
                           onStartJourney: widget.onStartJourney,
                         ),
@@ -89,18 +101,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : const Text('Setup Chat DB'),
                           ),
                         ],
-                        const SizedBox(height: 28),
-                        MoodCheckCard(
-                          userId: snapshot.data?.id,
-                          onReflectMore: widget.onReflectMore,
-                          onTakeAssessment: widget.onTakeAssessment,
-                          onMoodSelected: (mood) {
-                            if (mood == null || mood.isEmpty) return;
-                            setState(() {
-                              _selectedMoodForAction = mood;
-                            });
-                          },
-                        ),
                         if (_selectedMoodForAction != null) ...[
                           const SizedBox(height: 14),
                           Container(

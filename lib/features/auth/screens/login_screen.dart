@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/auth/auth_factory.dart';
 import '../../../core/auth/auth_service.dart';
 import '../../../core/config/app_environment.dart';
-import '../../navigation/main_navigation.dart';
+import '../../core/role_based_home.dart';
 import '../widgets/phone_input.dart';
 import 'otp_screen.dart';
 
@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (AppConfig.isDev || user != null) {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MainNavigation()),
+          MaterialPageRoute(builder: (_) => RoleBasedHome(user: user!)),
           (route) => false,
         );
       } else {
